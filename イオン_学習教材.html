@@ -1,0 +1,4571 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>イオン・周期表チャレンジ</title>
+
+
+<style>
+
+/* =========================================================
+   基本
+========================================================= */
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+
+  font-family:
+    "Noto Sans JP",
+    "Yu Gothic",
+    "Meiryo",
+    sans-serif;
+
+  background:#eef3f8;
+  color:#182235;
+}
+
+button,
+input{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+  border:none;
+  border-radius:9px;
+  padding:10px 15px;
+}
+
+.main{
+  background:#173b70;
+  color:white;
+  font-weight:bold;
+}
+
+.sub{
+  background:#e7edf6;
+  color:#173b70;
+}
+
+
+/* =========================================================
+   ヘッダー
+========================================================= */
+
+header{
+  background:#173b70;
+  color:white;
+
+  padding:15px 22px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  gap:15px;
+}
+
+header h1{
+  margin:0;
+  font-size:22px;
+}
+
+
+/* =========================================================
+   レイアウト
+========================================================= */
+
+.wrap{
+  max-width:1180px;
+  margin:auto;
+  padding:20px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.title{
+  text-align:center;
+  margin:15px 0 28px;
+}
+
+.title h2{
+  font-size:31px;
+  margin:8px;
+}
+
+.title p{
+  color:#667184;
+}
+
+.menu{
+  display:grid;
+  grid-template-columns:
+    repeat(3,1fr);
+  gap:18px;
+}
+
+.activity-card{
+  display:flex;
+  flex-direction:column;
+}
+
+.activity-card button{
+  margin-top:auto;
+}
+
+.card{
+  background:white;
+  border-radius:16px;
+  padding:20px;
+
+  box-shadow:
+    0 4px 16px #0001;
+}
+
+.menu .card{
+  min-height:220px;
+}
+
+.card h3{
+  font-size:20px;
+}
+
+.card p{
+  line-height:1.7;
+  color:#586477;
+}
+
+.top{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.top h2{
+  margin:0;
+}
+
+.score{
+  margin-left:auto;
+
+  background:white;
+
+  padding:9px 14px;
+
+  border-radius:9px;
+
+  box-shadow:
+    0 2px 8px #0001;
+}
+
+.notice{
+  background:#f1f6ff;
+
+  border-radius:10px;
+
+  padding:12px;
+
+  line-height:1.7;
+
+  margin-bottom:14px;
+}
+
+.feedback{
+  min-height:30px;
+
+  margin:10px 0;
+
+  font-weight:bold;
+}
+
+.feedback.ok{
+  color:#168047;
+}
+
+.feedback.ng{
+  color:#c93535;
+}
+
+
+/* =========================================================
+   ゲージ
+========================================================= */
+
+.gauge{
+  height:14px;
+
+  background:#e1e7ef;
+
+  border-radius:99px;
+
+  overflow:hidden;
+
+  margin:10px 0 4px;
+}
+
+.gauge-fill{
+  height:100%;
+
+  width:0%;
+
+  background:#3375c9;
+
+  border-radius:99px;
+
+  transition:
+    width .5s;
+}
+
+.gauge-label{
+  text-align:right;
+
+  font-size:13px;
+
+  color:#566174;
+
+  margin-bottom:10px;
+}
+
+
+/* =========================================================
+   周期表
+========================================================= */
+
+.scroll{
+  overflow:auto;
+  padding-bottom:5px;
+}
+
+.periodic{
+  display:grid;
+
+  grid-template-columns:
+    repeat(18,52px);
+
+  grid-template-rows:
+    30px
+    repeat(3,59px);
+
+  gap:4px;
+
+  min-width:1010px;
+}
+
+.group-number{
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  font-size:13px;
+  font-weight:700;
+
+  color:#52657d;
+
+  background:#dfe7f2;
+
+  border-radius:6px;
+}
+
+.cell{
+  border:
+    1px solid #adb8c7;
+
+  border-radius:6px;
+
+  background:white;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  min-width:0;
+}
+
+.cell .n{
+  font-size:9px;
+  color:#7a8493;
+}
+
+.cell b{
+  font-size:21px;
+}
+
+.cell small{
+  font-size:8px;
+  text-align:center;
+}
+
+.cell.clickable{
+  cursor:pointer;
+}
+
+.cell.clickable:hover{
+  background:#eef5ff;
+  border-color:#3375c9;
+}
+
+.cell.target{
+  outline:
+    3px dashed #3375c9;
+
+  background:#eef5ff;
+}
+
+
+/* =========================================================
+   元素カード
+========================================================= */
+
+.bank{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+
+  background:#f5f7fa;
+
+  padding:14px;
+
+  border-radius:10px;
+
+  margin-top:14px;
+}
+
+.tile{
+  width:60px;
+  height:58px;
+
+  background:white;
+
+  border:
+    2px solid #54709a;
+
+  border-radius:8px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  cursor:grab;
+}
+
+.tile b{
+  font-size:20px;
+}
+
+.tile small{
+  font-size:8px;
+}
+
+.tile.used{
+  opacity:.25;
+}
+
+
+/* =========================================================
+   クイズ
+========================================================= */
+
+.quiz{
+  max-width:720px;
+  margin:auto;
+  text-align:center;
+}
+
+.ion{
+  font-size:50px;
+
+  font-weight:800;
+
+  color:#173b70;
+
+  margin:18px;
+}
+
+.choices{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:10px;
+
+  margin:18px 0;
+}
+
+.choice{
+  background:#edf2f8;
+
+  border:
+    2px solid transparent;
+
+  width:100%;
+}
+
+.choice:hover{
+  background:#dfeaff;
+}
+
+.input{
+  width:100%;
+
+  padding:13px;
+
+  border:
+    2px solid #ccd5e2;
+
+  border-radius:9px;
+}
+
+
+/* =========================================================
+   原子モデル
+========================================================= */
+
+.atom-stage{
+
+  width:460px;
+  height:460px;
+
+  position:relative;
+
+  margin:20px auto;
+
+  overflow:visible;
+}
+
+
+/* ---------------------------------------------------------
+   殻
+--------------------------------------------------------- */
+
+.atom-shell{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  border-radius:50%;
+
+  pointer-events:none;
+
+  z-index:1;
+}
+
+
+/*
+  第1殻
+*/
+
+.atom-shell.shell-1{
+
+  width:150px;
+  height:150px;
+
+  border:
+    3px solid #8492a6;
+}
+
+
+/*
+  第2殻
+*/
+
+.atom-shell.shell-2{
+
+  width:290px;
+  height:290px;
+
+  border:
+    5px solid #3375c9;
+}
+
+
+/*
+  現在の最外殻
+*/
+
+.atom-shell.current-outer{
+
+  border-color:#3375c9;
+
+  border-width:5px;
+
+  box-shadow:
+    0 0 0 3px #3375c933;
+}
+
+
+/* ---------------------------------------------------------
+   最外殻ラベル
+--------------------------------------------------------- */
+
+.outer-label{
+
+  position:absolute;
+
+  left:50%;
+
+  transform:
+    translateX(-50%);
+
+  color:#3375c9;
+
+  font-weight:bold;
+
+  font-size:15px;
+
+  z-index:5;
+
+  pointer-events:none;
+}
+
+
+/* ---------------------------------------------------------
+   原子核
+--------------------------------------------------------- */
+
+.atom-nucleus{
+
+  position:absolute;
+
+  width:110px;
+  height:110px;
+
+  left:50%;
+  top:50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  border-radius:50%;
+
+  background:#f0b44d;
+
+  border:
+    3px solid #9a6c16;
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:center;
+
+  align-items:center;
+
+  text-align:center;
+
+  line-height:1.5;
+
+  z-index:5;
+
+  pointer-events:none;
+}
+
+
+/* ---------------------------------------------------------
+   電子
+--------------------------------------------------------- */
+
+.inner-electron{
+
+  position:absolute;
+
+  width:24px;
+  height:24px;
+
+  border-radius:50%;
+
+  background:#5d86b8;
+
+  z-index:4;
+
+  pointer-events:none;
+}
+
+
+.atom-electron{
+
+  position:absolute;
+
+  width:30px;
+  height:30px;
+
+  border-radius:50%;
+
+  background:#1769d2;
+
+  border:
+    2px solid #0d4d9f;
+
+  z-index:10;
+
+  cursor:grab;
+
+  user-select:none;
+
+  display:flex;
+
+  justify-content:center;
+  align-items:center;
+
+  color:white;
+
+  font-size:10px;
+
+  font-weight:bold;
+
+  transition:
+    transform .12s;
+}
+
+.atom-electron:hover{
+  transform:
+    scale(1.15);
+}
+
+.atom-electron:active{
+  cursor:grabbing;
+}
+
+
+/* =========================================================
+   電子操作エリア
+========================================================= */
+
+.electron-source{
+  transition:.15s;
+
+  border:
+    2px dashed #aaa;
+}
+
+.electron-source.drag-over{
+  border-color:#3375c9;
+
+  background:#eef5ff;
+
+  transform:
+    scale(1.03);
+}
+
+.electron-trash{
+  transition:.15s;
+
+  border:
+    2px dashed #aaa;
+}
+
+.electron-trash.drag-over{
+  border-color:#c93535;
+
+  background:#fff1f1;
+
+  transform:
+    scale(1.03);
+}
+
+
+/* =========================================================
+   イオン化成功表示
+========================================================= */
+
+.ion-result{
+
+  text-align:center;
+
+  background:#eaf8f0;
+
+  border:
+    2px solid #40a96b;
+
+  color:#146b3d;
+
+  border-radius:12px;
+
+  padding:15px;
+
+  margin-top:15px;
+
+  font-size:22px;
+
+  font-weight:bold;
+
+  display:none;
+}
+
+.ion-result.show{
+  display:block;
+}
+
+.ion-result .formula{
+  font-size:30px;
+  margin-top:5px;
+}
+
+
+/* =========================================================
+   統計
+========================================================= */
+
+.stats{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:12px;
+}
+
+.stat{
+  text-align:center;
+}
+
+.stat strong{
+  display:block;
+
+  font-size:28px;
+
+  color:#173b70;
+}
+
+table{
+  width:100%;
+
+  border-collapse:collapse;
+
+  margin-top:10px;
+}
+
+th,
+td{
+  padding:9px;
+
+  border-bottom:
+    1px solid #e0e5ed;
+
+  text-align:center;
+}
+
+
+/* =========================================================
+   スマホ
+========================================================= */
+
+@media(max-width:800px){
+
+  .menu{
+    grid-template-columns:
+      1fr;
+  }
+
+  .stats{
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+}
+
+@media(max-width:520px){
+
+  .choices,
+  .stats{
+    grid-template-columns:
+      1fr;
+  }
+
+  .atom-stage{
+
+    transform:
+      scale(.8);
+
+    transform-origin:
+      top center;
+
+    margin-bottom:
+      -80px;
+  }
+
+  header{
+    flex-direction:column;
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header>
+
+  <h1>
+    ⚡ イオン・周期表チャレンジ
+  </h1>
+
+  <span id="headerRate">
+    全体正解率：--
+  </span>
+
+</header>
+
+
+<div class="wrap">
+
+
+<!-- =========================================================
+     HOME
+========================================================= -->
+
+<section
+  id="home"
+  class="page active"
+>
+
+  <div class="title">
+
+    <h2>
+      化学を「やって」覚えよう
+    </h2>
+
+    <p>
+      動かす・答える・考える。
+    </p>
+
+  </div>
+
+
+  <div class="menu">
+
+
+    <div class="card activity-card">
+
+      <h3>
+        🧩 Activity 1<br>
+        周期表を完成させよう
+      </h3>
+
+      <p>
+        元素記号カードをドラッグして、
+        1～3周期の周期表を完成させます。
+      </p>
+
+      <div class="gauge">
+
+        <div
+          id="pGauge"
+          class="gauge-fill"
+        ></div>
+
+      </div>
+
+      <div
+        id="pRate"
+        class="gauge-label"
+      >
+        達成率：--
+      </div>
+
+      <button
+        class="main"
+        onclick="show('periodic')"
+      >
+        チャレンジする
+      </button>
+
+    </div>
+
+
+    <div class="card activity-card">
+
+      <h3>
+        ⚡ Activity 2<br>
+        イオン名 一問一答
+      </h3>
+
+      <p>
+        イオン式→日本語名、
+        日本語名→イオン式に挑戦します。
+      </p>
+
+      <div class="gauge">
+
+        <div
+          id="qGauge"
+          class="gauge-fill"
+        ></div>
+
+      </div>
+
+      <div
+        id="qRate"
+        class="gauge-label"
+      >
+        達成率：--
+      </div>
+
+      <button
+        class="main"
+        onclick="show('quiz')"
+      >
+        10問セットに挑戦
+      </button>
+
+    </div>
+
+
+    <div class="card activity-card">
+
+      <h3>
+        ⚛️ Activity 3<br>
+        イオンのでき方を体験
+      </h3>
+
+      <p>
+        原子を選び、
+        電子を捨てたり受け取ったりして、
+        イオンになる過程を体験します。
+      </p>
+
+      <div class="gauge">
+
+        <div
+          id="iGauge"
+          class="gauge-fill"
+        ></div>
+
+      </div>
+
+      <div
+        id="iRate"
+        class="gauge-label"
+      >
+        達成率：--
+      </div>
+
+      <button
+        class="main"
+        onclick="show('ionmake')"
+      >
+        体験する
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="notice"
+    style="
+      margin-top:18px;
+      text-align:center;
+    "
+  >
+
+    それぞれの活動に挑戦すると、
+    達成率ゲージが更新されます。
+
+  </div>
+
+
+  <div style="text-align:center">
+
+    <button
+      class="sub"
+      onclick="show('stats')"
+    >
+      📊 学習記録を見る
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     ACTIVITY 1
+========================================================= -->
+
+<section
+  id="periodic"
+  class="page"
+>
+
+  <div class="top">
+
+    <button
+      class="sub"
+      onclick="show('home')"
+    >
+      ← ホーム
+    </button>
+
+    <h2>
+      🧩 周期表を完成させよう
+    </h2>
+
+    <span
+      id="pScore"
+      class="score"
+    >
+      正解：0 / 18
+    </span>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="notice">
+
+      <b>ミッション：</b>
+      元素記号カードを正しい場所へドラッグ！
+
+      <br>
+
+      <b>ヒント：</b>
+      上の族番号と原子番号に注目しよう。
+
+    </div>
+
+
+    <div class="scroll">
+
+      <div
+        id="ptable"
+        class="periodic"
+      ></div>
+
+    </div>
+
+
+    <div
+      id="bank"
+      class="bank"
+    ></div>
+
+
+    <div
+      id="pFeedback"
+      class="feedback"
+    ></div>
+
+
+    <button
+      class="main"
+      onclick="checkP()"
+    >
+      答え合わせ
+    </button>
+
+    <button
+      class="sub"
+      onclick="resetP()"
+    >
+      最初から
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     ACTIVITY 2
+========================================================= -->
+
+<section
+  id="quiz"
+  class="page"
+>
+
+  <div class="top">
+
+    <button
+      class="sub"
+      onclick="show('home')"
+    >
+      ← ホーム
+    </button>
+
+    <h2>
+      ⚡ イオン名 一問一答
+    </h2>
+
+    <span
+      id="qScore"
+      class="score"
+    >
+      第1問 / 10問
+    </span>
+
+  </div>
+
+
+  <div class="card quiz">
+
+    <div>
+
+      <button
+        class="sub"
+        onclick="
+          mode='choice';
+          startQuiz();
+        "
+      >
+        選択式
+      </button>
+
+      <button
+        class="sub"
+        onclick="
+          mode='input';
+          startQuiz();
+        "
+      >
+        入力式
+      </button>
+
+    </div>
+
+
+    <p>
+      10問で1セット。
+      問題文をよく読んで答えよう。
+    </p>
+
+
+    <div
+      id="ion"
+      class="ion"
+    ></div>
+
+
+    <div id="answers"></div>
+
+
+    <div
+      id="qFeedback"
+      class="feedback"
+    ></div>
+
+
+    <button
+      id="next"
+      class="main"
+      style="display:none"
+      onclick="newQ()"
+    >
+      次の問題 →
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     ACTIVITY 3
+========================================================= -->
+
+<section
+  id="ionmake"
+  class="page"
+>
+
+  <div class="top">
+
+    <button
+      class="sub"
+      onclick="show('home')"
+    >
+      ← ホーム
+    </button>
+
+    <h2>
+      ⚛️ イオンのでき方を体験しよう
+    </h2>
+
+  </div>
+
+
+  <!-- 元素選択 -->
+
+  <div class="card">
+
+    <div class="notice">
+
+      <b>
+        ① 周期表から元素を選ぼう。
+      </b>
+
+      <br>
+
+      <b>
+        ② 最外殻電子の数を確認しよう。
+      </b>
+
+      <br>
+
+      <b>
+        ③ 電子を捨てたり受け取ったりしてみよう。
+      </b>
+
+      <br>
+
+      <br>
+
+      <span>
+        💡 電子がなくなって内側の殻が最外殻になったり、
+        最外殻が満タンになったりするとイオンになります。
+      </span>
+
+    </div>
+
+
+    <div class="scroll">
+
+      <div
+        id="makeTable"
+        class="periodic"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       原子モデル
+  ====================================================== -->
+
+  <div
+    id="atomArea"
+    class="card"
+    style="
+      margin-top:14px;
+      display:none;
+    "
+  >
+
+    <h3
+      id="atomTitle"
+      style="
+        text-align:center;
+      "
+    ></h3>
+
+
+    <p
+      style="
+        text-align:center;
+        font-size:18px;
+        font-weight:bold;
+      "
+    >
+      電子をドラッグして動かしてみよう！
+    </p>
+
+
+    <div
+      id="atomModel"
+      class="atom-stage"
+    ></div>
+
+
+    <!-- 操作 -->
+
+    <div
+      style="
+        display:flex;
+        gap:12px;
+        justify-content:center;
+        flex-wrap:wrap;
+        margin-top:10px;
+      "
+    >
+
+
+      <!-- 電子置き場 -->
+
+      <div
+        id="electronSource"
+        class="card electron-source"
+        style="
+          padding:12px;
+          text-align:center;
+          min-width:190px;
+        "
+      >
+
+        <b>
+          電子置き場
+        </b>
+
+        <br>
+
+        <span
+          style="
+            font-size:13px;
+          "
+        >
+          電子をここから
+          最外殻へドラッグ
+        </span>
+
+
+        <div
+          id="sourceElectron"
+          draggable="true"
+          style="
+            margin:10px auto 0;
+            width:36px;
+            height:36px;
+            border-radius:50%;
+            background:#1769d2;
+            color:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:grab;
+            font-weight:bold;
+          "
+        >
+          e⁻
+        </div>
+
+      </div>
+
+
+      <!-- ゴミ箱 -->
+
+      <div
+        id="electronTrash"
+        class="card electron-trash"
+        style="
+          padding:12px;
+          text-align:center;
+          min-width:190px;
+        "
+      >
+
+        <b>
+          🗑️ ゴミ箱
+        </b>
+
+        <br>
+
+        <span
+          style="
+            font-size:13px;
+          "
+        >
+          最外殻電子をここへドラッグ
+        </span>
+
+        <div
+          style="
+            font-size:42px;
+            line-height:1.1;
+            margin-top:6px;
+          "
+        >
+          🗑️
+        </div>
+
+      </div>
+
+
+      <!-- 現在の最外殻電子数 -->
+
+      <div
+        class="card"
+        style="
+          padding:12px;
+          text-align:center;
+          min-width:190px;
+        "
+      >
+
+        <b>
+          現在の最外殻電子
+        </b>
+
+        <br>
+
+        <span
+          id="outerCount"
+          style="
+            font-size:28px;
+            font-weight:bold;
+            color:#173b70;
+          "
+        >
+          0
+        </span>
+
+        個
+
+      </div>
+
+    </div>
+
+
+    <!-- 自動判定結果 -->
+
+    <div
+      id="ionResult"
+      class="ion-result"
+    >
+
+      <div id="ionResultText"></div>
+
+      <div
+        id="ionResultFormula"
+        class="formula"
+      ></div>
+
+    </div>
+
+
+    <div
+      id="makeFeedback"
+      class="feedback"
+      style="
+        text-align:center;
+        margin-top:15px;
+      "
+    ></div>
+
+
+    <div style="text-align:center">
+
+      <button
+        class="sub"
+        onclick="resetIon()"
+      >
+        原子の状態に戻す
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     STATS
+========================================================= -->
+
+<section
+  id="stats"
+  class="page"
+>
+
+  <div class="top">
+
+    <button
+      class="sub"
+      onclick="show('home')"
+    >
+      ← ホーム
+    </button>
+
+    <h2>
+      📊 学習記録
+    </h2>
+
+  </div>
+
+
+  <div class="stats">
+
+    <div class="card stat">
+
+      <strong id="tq">
+        0
+      </strong>
+
+      総問題数
+
+    </div>
+
+
+    <div class="card stat">
+
+      <strong id="tc">
+        0
+      </strong>
+
+      正解数
+
+    </div>
+
+
+    <div class="card stat">
+
+      <strong id="tr">
+        --%
+      </strong>
+
+      全体正解率
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="card"
+    style="
+      margin-top:14px;
+    "
+  >
+
+    <h3>
+      活動別
+    </h3>
+
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            活動
+          </th>
+
+          <th>
+            挑戦
+          </th>
+
+          <th>
+            正解
+          </th>
+
+          <th>
+            正解率
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="tbody"></tbody>
+
+    </table>
+
+
+    <br>
+
+
+    <button
+      class="sub"
+      onclick="clearRecord()"
+    >
+      記録をリセット
+    </button>
+
+  </div>
+
+</section>
+
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   元素
+========================================================= */
+
+const E = [
+
+  [1,'H','水素',1,1],
+  [2,'He','ヘリウム',18,1],
+
+  [3,'Li','リチウム',1,2],
+  [4,'Be','ベリリウム',2,2],
+
+  [5,'B','ホウ素',13,2],
+  [6,'C','炭素',14,2],
+  [7,'N','窒素',15,2],
+  [8,'O','酸素',16,2],
+  [9,'F','フッ素',17,2],
+  [10,'Ne','ネオン',18,2],
+
+  [11,'Na','ナトリウム',1,3],
+  [12,'Mg','マグネシウム',2,3],
+
+  [13,'Al','アルミニウム',13,3],
+  [14,'Si','ケイ素',14,3],
+  [15,'P','リン',15,3],
+  [16,'S','硫黄',16,3],
+  [17,'Cl','塩素',17,3],
+  [18,'Ar','アルゴン',18,3]
+
+];
+
+
+/* =========================================================
+   イオン
+========================================================= */
+
+const I = [
+
+  ['H⁺','水素イオン'],
+  ['Na⁺','ナトリウムイオン'],
+  ['K⁺','カリウムイオン'],
+  ['Mg²⁺','マグネシウムイオン'],
+  ['Ca²⁺','カルシウムイオン'],
+  ['Al³⁺','アルミニウムイオン'],
+
+  ['NH₄⁺','アンモニウムイオン'],
+
+  ['Cl⁻','塩化物イオン'],
+  ['OH⁻','水酸化物イオン'],
+  ['NO₃⁻','硝酸イオン'],
+  ['SO₄²⁻','硫酸イオン'],
+  ['CO₃²⁻','炭酸イオン'],
+
+  ['O²⁻','酸化物イオン'],
+  ['S²⁻','硫化物イオン']
+
+];
+
+
+/* =========================================================
+   学習記録
+========================================================= */
+
+const KEY =
+  'ionLearningStats_v5';
+
+
+function baseStats(){
+
+  return {
+
+    total:0,
+
+    correct:0,
+
+    p:{
+      total:0,
+      correct:0
+    },
+
+    q:{
+      total:0,
+      correct:0
+    },
+
+    i:{
+      total:0,
+      correct:0
+    },
+
+    quizSets:[]
+
+  };
+
+}
+
+
+function getStats(){
+
+  try{
+
+    const saved =
+      localStorage.getItem(
+        KEY
+      );
+
+    if(!saved){
+
+      return baseStats();
+
+    }
+
+    const s =
+      JSON.parse(saved);
+
+
+    return {
+
+      ...baseStats(),
+      ...s,
+
+      p:{
+        ...baseStats().p,
+        ...(s.p || {})
+      },
+
+      q:{
+        ...baseStats().q,
+        ...(s.q || {})
+      },
+
+      i:{
+        ...baseStats().i,
+        ...(s.i || {})
+      }
+
+    };
+
+  }
+
+  catch(error){
+
+    return baseStats();
+
+  }
+
+}
+
+
+function saveStats(s){
+
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(s)
+  );
+
+  updateUI();
+
+}
+
+
+function record(
+  type,
+  correct
+){
+
+  const s =
+    getStats();
+
+
+  s.total++;
+
+  s[type].total++;
+
+
+  if(correct){
+
+    s.correct++;
+
+    s[type].correct++;
+
+  }
+
+
+  saveStats(s);
+
+}
+
+
+function percentage(
+  correct,
+  total
+){
+
+  if(total === 0){
+
+    return null;
+
+  }
+
+  return Math.round(
+    correct /
+    total *
+    100
+  );
+
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function updateUI(){
+
+  const s =
+    getStats();
+
+
+  const overall =
+    percentage(
+      s.correct,
+      s.total
+    );
+
+
+  document.getElementById(
+    'headerRate'
+  ).textContent =
+    '全体正解率：' +
+    (
+      overall === null
+        ? '--'
+        : overall + '%'
+    );
+
+
+  const p =
+    percentage(
+      s.p.correct,
+      s.p.total
+    );
+
+
+  const q =
+    percentage(
+      s.q.correct,
+      s.q.total
+    );
+
+
+  const i =
+    percentage(
+      s.i.correct,
+      s.i.total
+    );
+
+
+  document.getElementById(
+    'pGauge'
+  ).style.width =
+    (p || 0) + '%';
+
+
+  document.getElementById(
+    'qGauge'
+  ).style.width =
+    (q || 0) + '%';
+
+
+  document.getElementById(
+    'iGauge'
+  ).style.width =
+    (i || 0) + '%';
+
+
+  document.getElementById(
+    'pRate'
+  ).textContent =
+    '達成率：' +
+    (
+      p === null
+        ? '--'
+        : p + '%'
+    );
+
+
+  document.getElementById(
+    'qRate'
+  ).textContent =
+    '達成率：' +
+    (
+      q === null
+        ? '--'
+        : q + '%'
+    );
+
+
+  document.getElementById(
+    'iRate'
+  ).textContent =
+    '達成率：' +
+    (
+      i === null
+        ? '--'
+        : i + '%'
+    );
+
+
+  document.getElementById(
+    'tq'
+  ).textContent =
+    s.total;
+
+
+  document.getElementById(
+    'tc'
+  ).textContent =
+    s.correct;
+
+
+  document.getElementById(
+    'tr'
+  ).textContent =
+    overall === null
+      ? '--%'
+      : overall + '%';
+
+
+  document.getElementById(
+    'tbody'
+  ).innerHTML = `
+
+    <tr>
+
+      <td>周期表</td>
+
+      <td>${s.p.total}</td>
+
+      <td>${s.p.correct}</td>
+
+      <td>
+        ${
+          percentage(
+            s.p.correct,
+            s.p.total
+          ) ?? '--'
+        }%
+      </td>
+
+    </tr>
+
+
+    <tr>
+
+      <td>イオン名</td>
+
+      <td>${s.q.total}</td>
+
+      <td>${s.q.correct}</td>
+
+      <td>
+        ${
+          percentage(
+            s.q.correct,
+            s.q.total
+          ) ?? '--'
+        }%
+      </td>
+
+    </tr>
+
+
+    <tr>
+
+      <td>イオンのでき方</td>
+
+      <td>${s.i.total}</td>
+
+      <td>${s.i.correct}</td>
+
+      <td>
+        ${
+          percentage(
+            s.i.correct,
+            s.i.total
+          ) ?? '--'
+        }%
+      </td>
+
+    </tr>
+
+  `;
+
+}
+
+
+/* =========================================================
+   ページ切り替え
+========================================================= */
+
+function show(id){
+
+  document
+    .querySelectorAll('.page')
+    .forEach(
+      page =>
+        page.classList.remove(
+          'active'
+        )
+    );
+
+
+  document
+    .getElementById(id)
+    .classList.add(
+      'active'
+    );
+
+
+  updateUI();
+
+
+  if(id === 'periodic'){
+
+    resetP();
+
+  }
+
+
+  if(id === 'quiz'){
+
+    startQuiz();
+
+  }
+
+
+  if(id === 'ionmake'){
+
+    buildMakeTable();
+
+  }
+
+}
+
+
+/* =========================================================
+   記録リセット
+========================================================= */
+
+function clearRecord(){
+
+  if(
+    !confirm(
+      '学習記録をすべてリセットしますか？'
+    )
+  ){
+
+    return;
+
+  }
+
+
+  localStorage.removeItem(
+    KEY
+  );
+
+
+  updateUI();
+
+}
+
+
+/* =========================================================
+   族番号
+========================================================= */
+
+function addGroupNumbers(
+  container
+){
+
+  for(
+    let group=1;
+    group<=18;
+    group++
+  ){
+
+    const label =
+      document.createElement(
+        'div'
+      );
+
+
+    label.className =
+      'group-number';
+
+
+    label.textContent =
+      group;
+
+
+    container.appendChild(
+      label
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   Activity 1
+========================================================= */
+
+let placed = {};
+
+let pChecked =
+  false;
+
+
+function buildP(){
+
+  const table =
+    document.getElementById(
+      'ptable'
+    );
+
+
+  table.innerHTML =
+    '';
+
+
+  addGroupNumbers(
+    table
+  );
+
+
+  for(
+    let period=1;
+    period<=3;
+    period++
+  ){
+
+    for(
+      let group=1;
+      group<=18;
+      group++
+    ){
+
+      const element =
+        E.find(
+          x =>
+            x[3] === group &&
+            x[4] === period
+        );
+
+
+      const cell =
+        document.createElement(
+          'div'
+        );
+
+
+      if(!element){
+
+        cell.style.visibility =
+          'hidden';
+
+        table.appendChild(
+          cell
+        );
+
+        continue;
+
+      }
+
+
+      cell.className =
+        'cell';
+
+
+      cell.dataset.z =
+        element[0];
+
+
+      cell.innerHTML = `
+
+        <span class="n">
+          ${element[0]}
+        </span>
+
+        <b>?</b>
+
+        <small>ここ</small>
+
+      `;
+
+
+      cell.addEventListener(
+        'dragover',
+        function(event){
+
+          event.preventDefault();
+
+          cell.classList.add(
+            'target'
+          );
+
+        }
+      );
+
+
+      cell.addEventListener(
+        'dragleave',
+        function(){
+
+          cell.classList.remove(
+            'target'
+          );
+
+        }
+      );
+
+
+      cell.addEventListener(
+        'drop',
+        function(event){
+
+          event.preventDefault();
+
+          cell.classList.remove(
+            'target'
+          );
+
+
+          const z =
+            Number(
+              event.dataTransfer.getData(
+                'z'
+              )
+            );
+
+
+          if(!z){
+            return;
+          }
+
+
+          Object.keys(
+            placed
+          ).forEach(
+            key => {
+
+              if(
+                placed[key] === z
+              ){
+
+                delete placed[key];
+
+              }
+
+            }
+          );
+
+
+          placed[
+            cell.dataset.z
+          ] = z;
+
+
+          renderP();
+
+        }
+      );
+
+
+      table.appendChild(
+        cell
+      );
+
+    }
+
+  }
+
+
+  renderP();
+
+}
+
+
+function renderP(){
+
+  document
+    .querySelectorAll(
+      '#ptable .cell'
+    )
+    .forEach(
+      cell => {
+
+        const targetZ =
+          Number(
+            cell.dataset.z
+          );
+
+
+        const placedZ =
+          placed[
+            targetZ
+          ];
+
+
+        const element =
+          E.find(
+            e =>
+              e[0] === placedZ
+          );
+
+
+        if(element){
+
+          cell.innerHTML = `
+
+            <span class="n">
+              ${element[0]}
+            </span>
+
+            <b>
+              ${element[1]}
+            </b>
+
+            <small>
+              ${element[2]}
+            </small>
+
+          `;
+
+        }
+
+        else{
+
+          cell.innerHTML = `
+
+            <span class="n">
+              ${targetZ}
+            </span>
+
+            <b>?</b>
+
+            <small>ここ</small>
+
+          `;
+
+        }
+
+      }
+    );
+
+
+  const bank =
+    document.getElementById(
+      'bank'
+    );
+
+
+  bank.innerHTML =
+    '';
+
+
+  const used =
+    new Set(
+      Object.values(
+        placed
+      )
+    );
+
+
+  E.forEach(
+    element => {
+
+      const tile =
+        document.createElement(
+          'div'
+        );
+
+
+      tile.className =
+        'tile';
+
+
+      if(
+        used.has(
+          element[0]
+        )
+      ){
+
+        tile.classList.add(
+          'used'
+        );
+
+        tile.draggable =
+          false;
+
+      }
+
+      else{
+
+        tile.draggable =
+          true;
+
+      }
+
+
+      tile.innerHTML = `
+
+        <b>
+          ${element[1]}
+        </b>
+
+        <small>
+          ${element[2]}
+        </small>
+
+      `;
+
+
+      if(
+        !used.has(
+          element[0]
+        )
+      ){
+
+        tile.addEventListener(
+          'dragstart',
+          function(event){
+
+            event.dataTransfer.setData(
+              'z',
+              element[0]
+            );
+
+          }
+        );
+
+      }
+
+
+      bank.appendChild(
+        tile
+      );
+
+    }
+  );
+
+}
+
+
+function resetP(){
+
+  placed = {};
+
+  pChecked =
+    false;
+
+
+  document.getElementById(
+    'pFeedback'
+  ).textContent =
+    '';
+
+
+  document.getElementById(
+    'pScore'
+  ).textContent =
+    '正解：0 / 18';
+
+
+  buildP();
+
+}
+
+
+function checkP(){
+
+  let correct =
+    0;
+
+
+  E.forEach(
+    element => {
+
+      if(
+        placed[
+          element[0]
+        ] === element[0]
+      ){
+
+        correct++;
+
+      }
+
+    }
+  );
+
+
+  document.getElementById(
+    'pScore'
+  ).textContent =
+    `正解：${correct} / 18`;
+
+
+  const feedback =
+    document.getElementById(
+      'pFeedback'
+    );
+
+
+  if(correct === 18){
+
+    feedback.textContent =
+      '🎉 完成！1～3周期を正しく配置できました。';
+
+    feedback.className =
+      'feedback ok';
+
+  }
+
+  else{
+
+    feedback.textContent =
+      `${correct}/18 正解。${18-correct}個をもう一度考えてみよう。`;
+
+    feedback.className =
+      'feedback ng';
+
+  }
+
+
+  if(!pChecked){
+
+    record(
+      'p',
+      correct === 18
+    );
+
+    pChecked =
+      true;
+
+  }
+
+}
+
+
+/* =========================================================
+   Activity 2
+========================================================= */
+
+let mode =
+  'choice';
+
+let currentQuestion =
+  null;
+
+let quizCorrect =
+  0;
+
+let quizTotal =
+  0;
+
+let quizLocked =
+  false;
+
+
+function shuffle(array){
+
+  return [...array].sort(
+    () =>
+      Math.random() - 0.5
+  );
+
+}
+
+
+function startQuiz(){
+
+  quizCorrect =
+    0;
+
+  quizTotal =
+    0;
+
+  quizLocked =
+    false;
+
+
+  newQ();
+
+}
+
+
+function newQ(){
+
+  if(
+    quizTotal >= 10
+  ){
+
+    finishQuizSet();
+
+    return;
+
+  }
+
+
+  quizLocked =
+    false;
+
+
+  document.getElementById(
+    'qFeedback'
+  ).textContent =
+    '';
+
+
+  document.getElementById(
+    'next'
+  ).style.display =
+    'none';
+
+
+  currentQuestion =
+    I[
+      Math.floor(
+        Math.random() *
+        I.length
+      )
+    ];
+
+
+  const reverse =
+    Math.random() < 0.5;
+
+
+  document.getElementById(
+    'ion'
+  ).textContent =
+    reverse
+      ? currentQuestion[1]
+      : currentQuestion[0];
+
+
+  const answers =
+    document.getElementById(
+      'answers'
+    );
+
+
+  if(mode === 'input'){
+
+    answers.innerHTML = `
+
+      <input
+        id="answerInput"
+        class="input"
+        placeholder="${
+          reverse
+            ? 'イオン式を入力'
+            : '日本語名を入力'
+        }"
+      >
+
+      <br><br>
+
+      <button
+        class="main"
+        onclick="submitInputAnswer()"
+      >
+        答える
+      </button>
+
+    `;
+
+  }
+
+  else{
+
+    let choices;
+
+
+    if(reverse){
+
+      choices =
+        shuffle([
+
+          currentQuestion[0],
+
+          ...shuffle(
+            I.filter(
+              x =>
+                x[0] !==
+                currentQuestion[0]
+            )
+          )
+          .slice(0,3)
+          .map(
+            x => x[0]
+          )
+
+        ]);
+
+    }
+
+    else{
+
+      choices =
+        shuffle([
+
+          currentQuestion[1],
+
+          ...shuffle(
+            I.filter(
+              x =>
+                x[1] !==
+                currentQuestion[1]
+            )
+          )
+          .slice(0,3)
+          .map(
+            x => x[1]
+          )
+
+        ]);
+
+    }
+
+
+    answers.innerHTML = `
+
+      <div class="choices">
+
+        ${
+          choices.map(
+            choice =>
+              `
+
+              <button
+                class="choice"
+                onclick="answerQuiz('${choice}')"
+              >
+                ${choice}
+              </button>
+
+              `
+          ).join('')
+        }
+
+      </div>
+
+    `;
+
+  }
+
+
+  document.getElementById(
+    'qScore'
+  ).textContent =
+    `第${quizTotal+1}問 / 10問　正解：${quizCorrect}`;
+
+}
+
+
+function submitInputAnswer(){
+
+  const input =
+    document.getElementById(
+      'answerInput'
+    );
+
+
+  if(!input){
+    return;
+  }
+
+
+  answerQuiz(
+    input.value.trim()
+  );
+
+}
+
+
+function answerQuiz(value){
+
+  if(quizLocked){
+    return;
+  }
+
+
+  quizLocked =
+    true;
+
+
+  const shown =
+    document.getElementById(
+      'ion'
+    ).textContent;
+
+
+  const expected =
+    shown === currentQuestion[0]
+      ? currentQuestion[1]
+      : currentQuestion[0];
+
+
+  const correct =
+    value === expected;
+
+
+  quizTotal++;
+
+
+  if(correct){
+
+    quizCorrect++;
+
+  }
+
+
+  const feedback =
+    document.getElementById(
+      'qFeedback'
+    );
+
+
+  if(correct){
+
+    feedback.textContent =
+      '⭕ 正解！';
+
+    feedback.className =
+      'feedback ok';
+
+  }
+
+  else{
+
+    feedback.textContent =
+      `❌ 不正解。正解は「${expected}」です。`;
+
+    feedback.className =
+      'feedback ng';
+
+  }
+
+
+  document.getElementById(
+    'qScore'
+  ).textContent =
+    `第${quizTotal}問 / 10問　正解：${quizCorrect}`;
+
+
+  const next =
+    document.getElementById(
+      'next'
+    );
+
+
+  next.style.display =
+    'inline-block';
+
+
+  if(
+    quizTotal >= 10
+  ){
+
+    next.textContent =
+      '10問終了 → 結果を見る';
+
+  }
+
+}
+
+
+function finishQuizSet(){
+
+  const s =
+    getStats();
+
+
+  s.q.total += 10;
+
+  s.q.correct +=
+    quizCorrect;
+
+  s.total += 10;
+
+  s.correct +=
+    quizCorrect;
+
+
+  s.quizSets.push({
+
+    correct:
+      quizCorrect,
+
+    total:
+      10,
+
+    date:
+      new Date()
+        .toLocaleString(
+          'ja-JP'
+        )
+
+  });
+
+
+  if(
+    s.quizSets.length > 20
+  ){
+
+    s.quizSets.shift();
+
+  }
+
+
+  saveStats(s);
+
+
+  document.getElementById(
+    'qScore'
+  ).textContent =
+    `10問セット：${quizCorrect} / 10問`;
+
+
+  document.getElementById(
+    'qFeedback'
+  ).textContent =
+    `🎉 セット終了！正解率 ${quizCorrect*10}%`;
+
+
+  document.getElementById(
+    'qFeedback'
+  ).className =
+    'feedback ok';
+
+
+  const next =
+    document.getElementById(
+      'next'
+    );
+
+
+  next.style.display =
+    'inline-block';
+
+
+  next.textContent =
+    'もう一度10問挑戦';
+
+
+  next.onclick =
+    function(){
+
+      startQuiz();
+
+    };
+
+}
+
+
+/* =========================================================
+   Activity 3
+   イオンのでき方
+========================================================= */
+
+
+/*
+  元素番号
+  → 最外殻電子数
+*/
+
+const outerMap = {
+
+  1:1,
+  2:2,
+
+  3:1,
+  4:2,
+  5:3,
+  6:4,
+  7:5,
+  8:6,
+  9:7,
+  10:8,
+
+  11:1,
+  12:2,
+  13:3,
+  14:4,
+  15:5,
+  16:6,
+  17:7,
+  18:8
+
+};
+
+
+/*
+  イオン化したときの表示名・式
+
+  今回の学習活動では、
+
+  1～5個
+    → 外側の電子を全部失う
+
+  6～7個
+    → 電子を受け取って8個にする
+
+  という判定にする。
+*/
+
+const ionInfo = {
+
+  1:{
+    name:'水素イオン',
+    formula:'H⁺',
+    mode:'lose'
+  },
+
+  2:{
+    name:'ヘリウムイオン',
+    formula:'He²⁺',
+    mode:'lose'
+  },
+
+  3:{
+    name:'リチウムイオン',
+    formula:'Li⁺',
+    mode:'lose'
+  },
+
+  4:{
+    name:'ベリリウムイオン',
+    formula:'Be²⁺',
+    mode:'lose'
+  },
+
+  5:{
+    name:'ホウ素イオン',
+    formula:'B³⁺',
+    mode:'lose'
+  },
+
+  6:{
+    name:'炭素イオン',
+    formula:'C⁴⁺',
+    mode:'lose'
+  },
+
+  7:{
+    name:'窒素イオン',
+    formula:'N⁵⁺',
+    mode:'lose'
+  },
+
+  8:{
+    name:'酸化物イオン',
+    formula:'O²⁻',
+    mode:'gain'
+  },
+
+  9:{
+    name:'フッ化物イオン',
+    formula:'F⁻',
+    mode:'gain'
+  },
+
+  10:{
+    name:'ネオン原子',
+    formula:'Ne',
+    mode:'none'
+  },
+
+  11:{
+    name:'ナトリウムイオン',
+    formula:'Na⁺',
+    mode:'lose'
+  },
+
+  12:{
+    name:'マグネシウムイオン',
+    formula:'Mg²⁺',
+    mode:'lose'
+  },
+
+  13:{
+    name:'アルミニウムイオン',
+    formula:'Al³⁺',
+    mode:'lose'
+  },
+
+  14:{
+    name:'ケイ素イオン',
+    formula:'Si⁴⁺',
+    mode:'lose'
+  },
+
+  15:{
+    name:'リンイオン',
+    formula:'P⁵⁺',
+    mode:'lose'
+  },
+
+  16:{
+    name:'硫化物イオン',
+    formula:'S²⁻',
+    mode:'gain'
+  },
+
+  17:{
+    name:'塩化物イオン',
+    formula:'Cl⁻',
+    mode:'gain'
+  },
+
+  18:{
+    name:'アルゴン原子',
+    formula:'Ar',
+    mode:'none'
+  }
+
+};
+
+
+/* ---------------------------------------------------------
+   選択中の元素
+--------------------------------------------------------- */
+
+let selectedElement =
+  null;
+
+
+/*
+  各殻の電子数を持つ
+
+  例：Na
+  [2,1]
+
+  O
+  [2,6]
+*/
+
+let shellElectrons =
+  [];
+
+
+/*
+  イオン化済みか
+*/
+
+let ionCompleted =
+  false;
+
+
+/*
+  もともとの最外殻電子数
+*/
+
+let baseOuter =
+  0;
+
+
+/*
+  元素選択
+========================================================= */
+
+function buildMakeTable(){
+
+  const table =
+    document.getElementById(
+      'makeTable'
+    );
+
+
+  table.innerHTML =
+    '';
+
+
+  addGroupNumbers(
+    table
+  );
+
+
+  for(
+    let period=1;
+    period<=3;
+    period++
+  ){
+
+    for(
+      let group=1;
+      group<=18;
+      group++
+    ){
+
+      const element =
+        E.find(
+          x =>
+            x[3] === group &&
+            x[4] === period
+        );
+
+
+      const cell =
+        document.createElement(
+          'div'
+        );
+
+
+      if(!element){
+
+        cell.style.visibility =
+          'hidden';
+
+        table.appendChild(
+          cell
+        );
+
+        continue;
+
+      }
+
+
+      cell.className =
+        'cell clickable';
+
+
+      cell.innerHTML = `
+
+        <span class="n">
+          ${element[0]}
+        </span>
+
+        <b>
+          ${element[1]}
+        </b>
+
+        <small>
+          ${element[2]}
+        </small>
+
+      `;
+
+
+      cell.addEventListener(
+        'click',
+        function(){
+
+          selectElement(
+            element
+          );
+
+        }
+      );
+
+
+      table.appendChild(
+        cell
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   元素を選択
+========================================================= */
+
+function selectElement(
+  element
+){
+
+  selectedElement =
+    element;
+
+
+  baseOuter =
+    outerMap[
+      element[0]
+    ];
+
+
+  /*
+    元素番号から初期電子配置
+
+    第1周期：
+      H  → [1]
+      He → [2]
+
+    第2・3周期：
+      [2, 最外殻電子]
+  */
+
+  if(
+    element[4] === 1
+  ){
+
+    shellElectrons = [
+      baseOuter
+    ];
+
+  }
+
+  else{
+
+    shellElectrons = [
+      2,
+      baseOuter
+    ];
+
+  }
+
+
+  ionCompleted =
+    false;
+
+
+  hideIonResult();
+
+
+  document.getElementById(
+    'atomArea'
+  ).style.display =
+    'block';
+
+
+  document.getElementById(
+    'atomTitle'
+  ).textContent =
+    `${element[1]}（${element[2]}）の原子`;
+
+
+  renderAtom();
+
+
+  setTimeout(
+    function(){
+
+      document.getElementById(
+        'atomArea'
+      ).scrollIntoView({
+        behavior:'smooth',
+        block:'start'
+      });
+
+    },
+    50
+  );
+
+}
+
+
+/* =========================================================
+   現在の最外殻を取得
+========================================================= */
+
+function getCurrentOuterIndex(){
+
+  /*
+    一番外側に電子が存在する殻を
+    現在の最外殻とする。
+
+    例：
+
+    [2,1]
+      ↓
+    index 1
+
+    [2,0]
+      ↓
+    index 0
+
+    [0]
+      ↓
+    index -1
+  */
+
+  for(
+    let i=shellElectrons.length-1;
+    i>=0;
+    i--
+  ){
+
+    if(
+      shellElectrons[i] > 0
+    ){
+
+      return i;
+
+    }
+
+  }
+
+
+  return -1;
+
+}
+
+
+/* =========================================================
+   現在の最外殻電子数
+========================================================= */
+
+function getCurrentOuterCount(){
+
+  const index =
+    getCurrentOuterIndex();
+
+
+  if(index < 0){
+
+    return 0;
+
+  }
+
+
+  return shellElectrons[
+    index
+  ];
+
+}
+
+
+/* =========================================================
+   原子モデル描画
+========================================================= */
+
+function renderAtom(){
+
+  if(!selectedElement){
+    return;
+  }
+
+
+  const stage =
+    document.getElementById(
+      'atomModel'
+    );
+
+
+  stage.innerHTML =
+    '';
+
+
+  /*
+    現在の最外殻
+  */
+
+  const outerIndex =
+    getCurrentOuterIndex();
+
+
+  /*
+    -------------------------------------------------------
+    殻を描画
+    -------------------------------------------------------
+
+    第1殻 → 150px
+    第2殻 → 290px
+
+    重要：
+    電子を捨てて第2殻が最外殻になったら、
+
+      第1殻 → 内側
+      第2殻 → 最外殻
+
+    として表示する。
+  */
+
+  for(
+    let i=0;
+    i<shellElectrons.length;
+    i++
+  ){
+
+    const shell =
+      document.createElement(
+        'div'
+      );
+
+
+    shell.className =
+      'atom-shell ' +
+      (
+        i === 0
+          ? 'shell-1'
+          : 'shell-2'
+      );
+
+
+    if(
+      i === outerIndex
+    ){
+
+      shell.classList.add(
+        'current-outer'
+      );
+
+    }
+
+
+    stage.appendChild(
+      shell
+    );
+
+
+    /*
+      現在の最外殻ラベル
+    */
+
+    if(
+      i === outerIndex
+    ){
+
+      const label =
+        document.createElement(
+          'div'
+        );
+
+
+      label.className =
+        'outer-label';
+
+
+      /*
+        第1殻が最外殻なら
+        少し内側に表示
+      */
+
+      if(i === 0){
+
+        label.style.top =
+          '115px';
+
+      }
+
+      else{
+
+        label.style.top =
+          '20px';
+
+      }
+
+
+      label.textContent =
+        '最外殻';
+
+
+      stage.appendChild(
+        label
+      );
+
+    }
+
+  }
+
+
+  /*
+    -------------------------------------------------------
+    原子核
+    -------------------------------------------------------
+  */
+
+  const nucleus =
+    document.createElement(
+      'div'
+    );
+
+
+  nucleus.className =
+    'atom-nucleus';
+
+
+  nucleus.innerHTML = `
+
+    <b>
+      原子核
+    </b>
+
+    <span>
+      陽子 ${selectedElement[0]}個
+    </span>
+
+  `;
+
+
+  stage.appendChild(
+    nucleus
+  );
+
+
+  /*
+    -------------------------------------------------------
+    各殻の電子
+    -------------------------------------------------------
+
+    第1殻
+      半径75
+
+    第2殻
+      半径145
+  */
+
+  shellElectrons.forEach(
+    (
+      count,
+      shellIndex
+    ) => {
+
+      const radius =
+        shellIndex === 0
+          ? 75
+          : 145;
+
+
+      for(
+        let i=0;
+        i<count;
+        i++
+      ){
+
+        createElectron(
+          stage,
+          shellIndex,
+          i,
+          radius,
+          shellIndex === outerIndex
+        );
+
+      }
+
+    }
+  );
+
+
+  /*
+    現在の最外殻電子数
+  */
+
+  document.getElementById(
+    'outerCount'
+  ).textContent =
+    getCurrentOuterCount();
+
+
+  /*
+    自動判定
+  */
+
+  checkIonization();
+
+}
+
+
+/* =========================================================
+   電子生成
+========================================================= */
+
+function createElectron(
+  stage,
+  shellIndex,
+  index,
+  radius,
+  draggable
+){
+
+  /*
+    最大8方向
+
+    電子が2個の場合なども
+    できるだけ見やすい配置にする。
+  */
+
+  const count =
+    shellElectrons[
+      shellIndex
+    ];
+
+
+  let angle;
+
+
+  if(count === 1){
+
+    angle =
+      -Math.PI / 2;
+
+  }
+
+  else{
+
+    angle =
+      (
+        Math.PI * 2 /
+        Math.max(
+          count,
+          8
+        )
+      ) *
+      index
+      -
+      Math.PI / 2;
+
+  }
+
+
+  const center =
+    230;
+
+
+  const x =
+    center +
+    radius *
+    Math.cos(angle);
+
+
+  const y =
+    center +
+    radius *
+    Math.sin(angle);
+
+
+  const electron =
+    document.createElement(
+      'div'
+    );
+
+
+  /*
+    最外殻電子だけ
+    ドラッグ可能
+  */
+
+  if(draggable){
+
+    electron.className =
+      'atom-electron';
+
+
+    electron.textContent =
+      'e⁻';
+
+
+    electron.draggable =
+      true;
+
+
+    electron.dataset.shell =
+      shellIndex;
+
+
+    electron.addEventListener(
+      'dragstart',
+      function(event){
+
+        event.dataTransfer.setData(
+          'removeElectron',
+          '1'
+        );
+
+
+        event.dataTransfer.setData(
+          'shellIndex',
+          shellIndex
+        );
+
+
+        event.dataTransfer.effectAllowed =
+          'move';
+
+      }
+    );
+
+  }
+
+  else{
+
+    electron.className =
+      'inner-electron';
+
+  }
+
+
+  electron.style.left =
+    `${x - (draggable ? 15 : 12)}px`;
+
+
+  electron.style.top =
+    `${y - (draggable ? 15 : 12)}px`;
+
+
+  stage.appendChild(
+    electron
+  );
+
+}
+
+
+/* =========================================================
+   電子追加
+========================================================= */
+
+const sourceElectron =
+  document.getElementById(
+    'sourceElectron'
+  );
+
+const sourceArea =
+  document.getElementById(
+    'electronSource'
+  );
+
+
+sourceElectron.addEventListener(
+  'dragstart',
+  function(event){
+
+    event.dataTransfer.setData(
+      'addElectron',
+      '1'
+    );
+
+    event.dataTransfer.effectAllowed =
+      'copy';
+
+  }
+);
+
+
+/*
+  電子置き場へのドラッグ
+*/
+
+sourceArea.addEventListener(
+  'dragover',
+  function(event){
+
+    event.preventDefault();
+
+    sourceArea.classList.add(
+      'drag-over'
+    );
+
+  }
+);
+
+
+sourceArea.addEventListener(
+  'dragleave',
+  function(){
+
+    sourceArea.classList.remove(
+      'drag-over'
+    );
+
+  }
+);
+
+
+/*
+  最外殻電子を電子置き場に戻す
+*/
+
+sourceArea.addEventListener(
+  'drop',
+  function(event){
+
+    event.preventDefault();
+
+    sourceArea.classList.remove(
+      'drag-over'
+    );
+
+
+    const remove =
+      event.dataTransfer.getData(
+        'removeElectron'
+      );
+
+
+    if(
+      remove !== '1'
+    ){
+
+      return;
+
+    }
+
+
+    removeOuterElectron();
+
+  }
+);
+
+
+/* =========================================================
+   ゴミ箱
+========================================================= */
+
+const trash =
+  document.getElementById(
+    'electronTrash'
+  );
+
+
+trash.addEventListener(
+  'dragover',
+  function(event){
+
+    event.preventDefault();
+
+    event.dataTransfer.dropEffect =
+      'move';
+
+    trash.classList.add(
+      'drag-over'
+    );
+
+  }
+);
+
+
+trash.addEventListener(
+  'dragleave',
+  function(){
+
+    trash.classList.remove(
+      'drag-over'
+    );
+
+  }
+);
+
+
+trash.addEventListener(
+  'drop',
+  function(event){
+
+    event.preventDefault();
+
+    trash.classList.remove(
+      'drag-over'
+    );
+
+
+    const remove =
+      event.dataTransfer.getData(
+        'removeElectron'
+      );
+
+
+    if(
+      remove !== '1'
+    ){
+
+      return;
+
+    }
+
+
+    removeOuterElectron();
+
+  }
+);
+
+
+/* =========================================================
+   最外殻電子を1個捨てる
+========================================================= */
+
+function removeOuterElectron(){
+
+  const outerIndex =
+    getCurrentOuterIndex();
+
+
+  if(
+    outerIndex < 0
+  ){
+
+    return;
+
+  }
+
+
+  /*
+    最外殻電子を1個減らす
+  */
+
+  shellElectrons[
+    outerIndex
+  ]--;
+
+
+  renderAtom();
+
+
+  /*
+    自動判定は renderAtom()
+    → checkIonization()
+    で行われる。
+
+    したがってここでは
+    「8個になったか」
+    の判定をしない。
+  */
+
+}
+
+
+/* =========================================================
+   原子モデルへの電子追加
+========================================================= */
+
+const atomModel =
+  document.getElementById(
+    'atomModel'
+  );
+
+
+atomModel.addEventListener(
+  'dragover',
+  function(event){
+
+    if(
+      event.dataTransfer.types.includes(
+        'addElectron'
+      )
+    ){
+
+      event.preventDefault();
+
+      event.dataTransfer.dropEffect =
+        'copy';
+
+    }
+
+  }
+);
+
+
+atomModel.addEventListener(
+  'drop',
+  function(event){
+
+    event.preventDefault();
+
+
+    const add =
+      event.dataTransfer.getData(
+        'addElectron'
+      );
+
+
+    if(
+      add !== '1'
+    ){
+
+      return;
+
+    }
+
+
+    addOuterElectron();
+
+  }
+);
+
+
+/* =========================================================
+   最外殻へ電子を1個追加
+========================================================= */
+
+function addOuterElectron(){
+
+  const outerIndex =
+    getCurrentOuterIndex();
+
+
+  /*
+    現在の最外殻が存在しない場合
+
+    例：
+    H+になった後など
+
+    第1殻を新しく作る。
+  */
+
+  if(
+    outerIndex < 0
+  ){
+
+    shellElectrons = [1];
+
+    renderAtom();
+
+    return;
+
+  }
+
+
+  /*
+    現在の最外殻が8個なら
+    その殻には追加しない。
+
+    この教材では
+    「8個の殻が満タンになったら
+     それ以上外側へ電子を追加する」
+    という操作は行わない。
+  */
+
+  if(
+    shellElectrons[
+      outerIndex
+    ] >= 8
+  ){
+
+    showIonFeedback(
+      'この最外殻は満タンです。',
+      'ng'
+    );
+
+    return;
+
+  }
+
+
+  /*
+    1個追加
+  */
+
+  shellElectrons[
+    outerIndex
+  ]++;
+
+
+  renderAtom();
+
+}
+
+
+/* =========================================================
+   イオン化判定
+========================================================= */
+
+function checkIonization(){
+
+  if(!selectedElement){
+
+    return;
+
+  }
+
+
+  if(ionCompleted){
+
+    return;
+
+  }
+
+
+  const z =
+    selectedElement[0];
+
+
+  const info =
+    ionInfo[z];
+
+
+  if(!info){
+
+    return;
+
+  }
+
+
+  /*
+    -------------------------------------------------------
+    1～5個タイプ
+    -------------------------------------------------------
+
+    「最初の最外殻電子をすべて捨てた」
+
+    が判定条件。
+
+    例：
+
+    Na
+      [2,1]
+
+    ↓ 1個捨てる
+
+      [2,0]
+
+    ↓
+
+    第2殻の2個が
+    新しい最外殻
+
+    → Na+
+  */
+
+  if(
+    info.mode === 'lose'
+  ){
+
+    const outerIndex =
+      getCurrentOuterIndex();
+
+
+    /*
+      もともとの最外殻が
+      空になったか
+    */
+
+    if(
+      outerIndex <
+      shellElectrons.length - 1
+    ){
+
+      completeIonization();
+
+      return;
+
+    }
+
+
+    /*
+      第1殻しかなく、
+      それも空になった場合
+
+      H+ / He2+など
+    */
+
+    if(
+      shellElectrons.length === 1 &&
+      shellElectrons[0] === 0
+    ){
+
+      completeIonization();
+
+      return;
+
+    }
+
+  }
+
+
+  /*
+    -------------------------------------------------------
+    6～7個タイプ
+    -------------------------------------------------------
+
+    「最外殻が8個になった」
+
+    が判定条件。
+
+    例：
+
+    Cl
+      [2,7]
+
+    ↓ 電子1個追加
+
+      [2,8]
+
+    → Cl-
+  */
+
+  if(
+    info.mode === 'gain'
+  ){
+
+    const outerIndex =
+      getCurrentOuterIndex();
+
+
+    if(
+      outerIndex >= 0 &&
+      shellElectrons[
+        outerIndex
+      ] === 8
+    ){
+
+      completeIonization();
+
+      return;
+
+    }
+
+  }
+
+
+  /*
+    通常メッセージ
+  */
+
+  if(
+    info.mode === 'lose'
+  ){
+
+    showIonFeedback(
+
+      '💡 最外殻電子をすべて捨てると、内側の殻が新しい最外殻になります。',
+
+      ''
+
+    );
+
+  }
+
+  else if(
+    info.mode === 'gain'
+  ){
+
+    showIonFeedback(
+
+      '💡 最外殻を8個にするために電子を受け取ろう！',
+
+      ''
+
+    );
+
+  }
+
+  else{
+
+    showIonFeedback(
+
+      'この原子はすでに最外殻が満たされています。',
+
+      ''
+
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   イオン化完了
+========================================================= */
+
+function completeIonization(){
+
+  if(
+    ionCompleted
+  ){
+
+    return;
+
+  }
+
+
+  ionCompleted =
+    true;
+
+
+  const z =
+    selectedElement[0];
+
+
+  const info =
+    ionInfo[z];
+
+
+  /*
+    成功表示
+  */
+
+  document.getElementById(
+    'ionResultText'
+  ).textContent =
+    `${info.name}になった！`;
+
+
+  document.getElementById(
+    'ionResultFormula'
+  ).textContent =
+    `（${info.formula}）`;
+
+
+  document.getElementById(
+    'ionResult'
+  ).classList.add(
+    'show'
+  );
+
+
+  document.getElementById(
+    'makeFeedback'
+  ).textContent =
+    '🎉 電子配置が変化してイオンになりました！';
+
+
+  document.getElementById(
+    'makeFeedback'
+  ).className =
+    'feedback ok';
+
+
+  /*
+    Activity 3の正解として記録
+  */
+
+  record(
+    'i',
+    true
+  );
+
+}
+
+
+/* =========================================================
+   通常フィードバック
+========================================================= */
+
+function showIonFeedback(
+  message,
+  type=''
+){
+
+  const feedback =
+    document.getElementById(
+      'makeFeedback'
+    );
+
+
+  feedback.textContent =
+    message;
+
+
+  feedback.className =
+    'feedback ' +
+    type;
+
+}
+
+
+/* =========================================================
+   結果表示を隠す
+========================================================= */
+
+function hideIonResult(){
+
+  const result =
+    document.getElementById(
+      'ionResult'
+    );
+
+
+  result.classList.remove(
+    'show'
+  );
+
+
+  document.getElementById(
+    'ionResultText'
+  ).textContent =
+    '';
+
+
+  document.getElementById(
+    'ionResultFormula'
+  ).textContent =
+    '';
+
+}
+
+
+/* =========================================================
+   原子の状態へ戻す
+========================================================= */
+
+function resetIon(){
+
+  if(!selectedElement){
+
+    return;
+
+  }
+
+
+  baseOuter =
+    outerMap[
+      selectedElement[0]
+    ];
+
+
+  if(
+    selectedElement[4] === 1
+  ){
+
+    shellElectrons = [
+      baseOuter
+    ];
+
+  }
+
+  else{
+
+    shellElectrons = [
+      2,
+      baseOuter
+    ];
+
+  }
+
+
+  ionCompleted =
+    false;
+
+
+  hideIonResult();
+
+
+  renderAtom();
+
+}
+
+
+/* =========================================================
+   初期化
+========================================================= */
+
+buildP();
+
+buildMakeTable();
+
+updateUI();
+
+</script>
+
+
+</body>
+
+</html>
